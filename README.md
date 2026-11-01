@@ -5,7 +5,7 @@ Python-based customer service agent developed for the **Artefact AI Engineer tec
 
 > **Status:** Functional prototype tested locally with the Google Gemini API.
 >
-> The application integrates read-only customer service tools, deterministic business rules, multilingual responses, **12 passing automated tests**, and **four recorded conversation examples**.
+> The application integrates read-only customer service tools, deterministic business rules, multilingual responses, **20 passing automated tests**, and **four recorded conversation examples**.
 >
 > Product availability, orders, and promotions come from the challenge's **historical dataset**, not live store systems.
 
@@ -299,6 +299,24 @@ Run the complete test suite:
 python -m pytest -q
 ```
 
+
+### Multilingual Policy Retrieval Tests
+
+Eight additional automated tests validate policy retrieval
+across Portuguese, English, and Spanish.
+
+The tests cover:
+
+- Store opening hours in Portuguese, English, and Spanish.
+- Online purchase withdrawal policies in all three languages.
+- Promotional discount rules involving PIX in Spanish.
+- Source identification in retrieved policy responses.
+
+All tests run locally without requiring Gemini API calls.
+
+**Total automated tests: 20 passed, 0 failed.**
+
+
 ### Automated Test Results
 
 The test suite was executed locally using:
@@ -307,7 +325,7 @@ The test suite was executed locally using:
 - Pytest 9.2.0
 - Windows environment
 
-**Result: 12 passed, 0 failed.**
+**Result: 20 passed, 0 failed.**
 
 The test suite covers:
 
@@ -502,7 +520,7 @@ Development progress is recorded through incremental Git commits.
 - [x] Implement the Python customer service agent.
 - [x] Configure and test the Gemini API.
 - [x] Integrate catalog, order, promotion, payment, and policy tools.
-- [x] Execute the automated test suite successfully (12 passed).
+- [x] Execute the automated test suite successfully (20 passed).
 - [x] Validate multilingual customer interactions.
 - [x] Generate and review four real conversation examples.
 - [x] Maintain incremental development commits.
