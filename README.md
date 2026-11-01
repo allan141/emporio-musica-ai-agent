@@ -73,6 +73,33 @@ The tools are responsible for data retrieval, basic lookup checks, and monetary 
 
 Tool results and retrieved documents are treated as **data, not instructions**.
 
+
+### Tool Execution Observability
+
+The agent records which Python tools were executed during each
+customer message using Gemini's conversation history.
+
+After each response, the Streamlit interface displays the names
+of the tools used in that specific interaction.
+
+For example:
+
+- Product searches: `search_products`
+- Store policies: `get_store_policy`
+- Promotions: `get_active_promotions`
+- Order inquiries: `get_order_status`
+- Payment calculations: `calculate_payment`
+
+This feature was manually validated through customer conversations
+in Portuguese, English, and Spanish.
+
+For privacy, the displayed execution summary contains only tool
+names, not function arguments, customer emails, or order details.
+
+The current implementation provides basic, session-level
+observability rather than persistent production audit logging.
+
+
 ### Prompt Strategy
 
 The system prompt defines Melodia's friendly, professional persona and the store's product scope.
