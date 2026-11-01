@@ -542,21 +542,21 @@ The repository contains the Python application, source data, automated tests, do
 
 Development progress is recorded through incremental Git commits.
 
-## Delivery Checklist
+## Development Checklist
 
 - [x] Implement the Python customer service agent.
-- [x] Configure and test the Gemini API.
+- [x] Configure and validate the Gemini API integration.
 - [x] Integrate catalog, order, promotion, payment, and policy tools.
+- [x] Implement per-turn tool execution observability.
+- [x] Validate customer interactions in Portuguese, English, and Spanish.
+- [x] Validate product searches, promotions, payment rules, and online returns.
+- [x] Implement basic order lookup privacy checks.
 - [x] Execute the automated test suite successfully (20 passed).
-- [x] Validate multilingual customer interactions.
 - [x] Generate and review four real conversation examples.
+- [x] Document the architecture, technical decisions, and known limitations.
+- [x] Review tracked files and perform preliminary credential checks.
 - [x] Maintain incremental development commits.
 - [x] Publish the project in a public GitHub repository.
-- [ ] Complete the final documentation and code review.
-- [ ] Perform the final repository security audit.
-- [ ] Confirm the required submission channel with recruiting.
-- [ ] Submit the repository before the established deadline.
-- [ ] Avoid modifying the repository after the final submission timestamp.
 
 ---
 
