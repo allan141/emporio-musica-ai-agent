@@ -19,7 +19,7 @@ June 2025. The CSV records are historical snapshots rather than live integration
 ## Tech stack and decisions
 
 - **Python 3.11–3.13** as required by the challenge.
-- **Google Gemini 2.5 Flash-Lite** through `google-genai` for a free-tier option
+- **Google gemini-3.5-flash-lite** through `google-genai` for a free-tier option
   (subject to availability, quotas and policy changes).
 - **Single LLM supervisor + Python function calling**, instead of importing the
   large LangGraph supervisor from the Triggo.ai reimbursement project. That project
