@@ -32,20 +32,56 @@ with st.sidebar:
         st.session_state.agent = StoreAgent()
         st.rerun()
 
+
 for item in st.session_state.messages:
     with st.chat_message(item["role"]):
         st.markdown(item["content"])
 
-if prompt := st.chat_input("Pergunte sobre instrumentos, preços, pedidos ou trocas..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+        if item.get("tools"):
+            st.caption(
+                "Ferramentas utilizadas: "
+                + ", ".join(item["tools"])
+            )
+
+
+if prompt := st.chat_input(
+    "Pergunte sobre instrumentos, preços, pedidos ou trocas..."
+):
+    st.session_state.messages.append({
+        "role": "user",
+        "content": prompt,
+    })
+
     with st.chat_message("user"):
         st.markdown(prompt)
+
+    tool_calls = []
+
     with st.chat_message("assistant"):
         with st.spinner("Consultando informações da loja..."):
             try:
                 answer = st.session_state.agent.send(prompt)
+                tool_calls = list(
+                    st.session_state.agent.last_tool_calls
+                )
+
             except Exception as error:
-                answer = ("Não consegui consultar o modelo agora. Verifique sua chave, modelo e limites "
-                          f"da API. Detalhe técnico: {type(error).__name__}")
-            st.markdown(answer)
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+                answer = (
+                    "Não consegui consultar o modelo agora. "
+                    "Verifique sua chave, modelo e limites da API. "
+                    f"Detalhe técnico: {type(error).__name__}"
+                )
+
+        st.markdown(answer)
+
+        if tool_calls:
+            st.caption(
+                "Ferramentas utilizadas: "
+                + ", ".join(tool_calls)
+            )
+
+    st.session_state.messages.append({
+        "role": "assistant",
+        "content": answer,
+        "tools": tool_calls,
+    })

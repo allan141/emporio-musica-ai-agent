@@ -1,8 +1,8 @@
 
 """Customer service agent using Google Gemini function calling.
 
-The architecture separates LLM orchestration, data retrieval,
-and deterministic business rules through independent Python tools.
+Separates LLM orchestration from deterministic business rules
+and records the names of tools invoked during each response.
 """
 
 import os
@@ -28,11 +28,8 @@ class StoreAgent:
     """Session-scoped customer service agent with read-only tools."""
 
     def __init__(self):
-        # Load configuration from the project root.
         project_root = Path(__file__).resolve().parents[1]
-        env_path = project_root / ".env"
-
-        load_dotenv(dotenv_path=env_path)
+        load_dotenv(dotenv_path=project_root / ".env")
 
         api_key = os.environ.get("GEMINI_API_KEY", "").strip()
 
@@ -43,13 +40,11 @@ class StoreAgent:
         }:
             raise RuntimeError(
                 "GEMINI_API_KEY is not configured. "
-                "Create a .env file using .env.example."
+                "See .env.example and README.md."
             )
 
-        # Initialize the local database from the challenge CSV files.
         initialize_database()
 
-        # Configure Gemini.
         self.client = genai.Client(api_key=api_key)
 
         self.model = (
@@ -60,21 +55,19 @@ class StoreAgent:
             or "gemini-3.5-flash-lite"
         )
 
-        # Available read-only business tools.
-        tools = [
-            search_products,
-            get_product,
-            get_active_promotions,
-            get_order_status,
-            get_store_policy,
-            calculate_payment,
-        ]
+        self.last_tool_calls = []
 
-        # Configure the model and automatic function calling.
         config = types.GenerateContentConfig(
             system_instruction=SYSTEM_PROMPT,
             temperature=0.2,
-            tools=tools,
+            tools=[
+                search_products,
+                get_product,
+                get_active_promotions,
+                get_order_status,
+                get_store_policy,
+                calculate_payment,
+            ],
             automatic_function_calling=(
                 types.AutomaticFunctionCallingConfig(
                     maximum_remote_calls=6,
@@ -82,28 +75,47 @@ class StoreAgent:
             ),
         )
 
-        # Create a session-scoped conversation.
         self.chat = self.client.chats.create(
             model=self.model,
             config=config,
         )
 
+    
     def send(self, text: str) -> str:
-        """Send a customer message and return the model response."""
+        """Send a message and track tools executed in this turn."""
+
+        self.last_tool_calls = []
 
         if not isinstance(text, str):
             raise TypeError("Customer message must be a string.")
 
         if not text.strip():
-            return (
-                "Me conta como posso ajudar "
-                "com seu instrumento!"
-            )
+            return "Me conta como posso ajudar com seu instrumento!"
 
-        # API exceptions intentionally propagate to the caller.
-        # Streamlit handles user-facing errors, while the example
-        # generator handles temporary rate limits and retries.
+        # Remember where the current turn starts.
+        history_start = len(
+            self.chat.get_history(curated=True)
+        )
+
         response = self.chat.send_message(text)
+
+        # Examine only the history added by this message.
+        new_history = self.chat.get_history(
+            curated=True
+        )[history_start:]
+
+        for turn in new_history:
+            for part in getattr(turn, "parts", None) or []:
+                function_response = getattr(
+                    part,
+                    "function_response",
+                    None,
+                )
+
+                if function_response and function_response.name:
+                    self.last_tool_calls.append(
+                        function_response.name
+                    )
 
         if response.text and response.text.strip():
             return response.text.strip()
